@@ -14,7 +14,6 @@ namespace Microsoft.Deployment.WindowsInstaller
 {
     using System;
     using System.Collections;
-    using System.Configuration;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Reflection;
@@ -89,7 +88,7 @@ namespace Microsoft.Deployment.WindowsInstaller
 
             try
             {
-                string resourcePath = Path.GetDirectoryName(EmbeddedUIProxy.uiInstance.GetType().Assembly.Location);
+                string resourcePath = Path.GetDirectoryName(EmbeddedUIProxy.uiInstance.GetType().GetTypeInfo().Assembly.Location);
                 InstallUIOptions uiOptions = (InstallUIOptions) internalUILevel;
                 if (EmbeddedUIProxy.DebugBreakEnabled("Initialize"))
                 {
@@ -218,7 +217,9 @@ namespace Microsoft.Deployment.WindowsInstaller
             Assembly uiAssembly;
             try
             {
-                uiAssembly = AppDomain.CurrentDomain.Load(assemblyName);
+                var context = new CustomLoadContext();
+                //uiAssembly = AppDomain.CurrentDomain.Load(assemblyName);
+                uiAssembly = context.LoadFromFile(assemblyName);
 
                 // This calls out to CustomActionProxy.DebugBreakEnabled() directly instead
                 // of calling EmbeddedUIProxy.DebugBreakEnabled() because we don't compose a
@@ -228,7 +229,9 @@ namespace Microsoft.Deployment.WindowsInstaller
                     System.Diagnostics.Debugger.Launch();
                 }
 
-                return (IEmbeddedUI) uiAssembly.CreateInstance(EmbeddedUIProxy.uiClass);
+                var type = uiAssembly.GetType(EmbeddedUIProxy.uiClass);
+                //return (IEmbeddedUI) uiAssembly.CreateInstance(EmbeddedUIProxy.uiClass);
+                return (IEmbeddedUI) Activator.CreateInstance(type);
             }
             catch (Exception ex)
             {

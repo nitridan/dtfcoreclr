@@ -14,7 +14,6 @@ namespace Microsoft.Deployment.WindowsInstaller
 {
 using System;
 using System.Text;
-using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 
@@ -311,7 +310,6 @@ internal static class NativeMethods
             return msiHandle.handle;
         }
 
-        [SecurityPermission(SecurityAction.Assert, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
             return RemotableNativeMethods.MsiCloseHandle((int) this.handle) == 0;

@@ -50,7 +50,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             {
                 if (errorResources == null)
                 {
-                    errorResources = new ResourceManager(typeof(Installer).Namespace + ".Errors", typeof(Installer).Assembly);
+                    errorResources = new ResourceManager(typeof(Installer).Namespace + ".Errors", typeof(Installer).GetTypeInfo().Assembly);
                 }
                 return errorResources;
             }
@@ -100,7 +100,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             if (msg == null)
             {
                 string msiMsgModule = Path.Combine(
-                    Environment.SystemDirectory, "msimsg.dll");
+                    Environment.GetEnvironmentVariable("windir"), "system32", "msimsg.dll");
                 msg = Installer.GetMessageFromModule(
                     msiMsgModule, errorNumber, culture);
             }
@@ -124,8 +124,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             {
                 // On pre-Vista systems, the messages are stored as RCDATA resources.
 
-                int lcid = (culture == CultureInfo.InvariantCulture) ?
-                    0 : culture.LCID;
+                int lcid = 0;
                 IntPtr resourceInfo = NativeMethods.FindResourceEx(
                     msgModule,
                     new IntPtr(RT_RCDATA),
@@ -151,8 +150,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                         }
                         byte[] msgBytes = new byte[len + 1];
                         Marshal.Copy(resourcePtr, msgBytes, 0, msgBytes.Length);
-                        Encoding encoding = Encoding.GetEncoding(
-                            culture.TextInfo.ANSICodePage);
+                        Encoding encoding = Encoding.ASCII;
                         string msg = encoding.GetString(msgBytes);
                         return msg;
                     }

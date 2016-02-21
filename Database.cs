@@ -230,7 +230,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                 }
                 finally
                 {
-                    if (reader != null) reader.Close();
+                    if (reader != null) reader.Dispose();
                     File.Delete(tempFile);
                 }
             }
@@ -245,13 +245,13 @@ namespace Microsoft.Deployment.WindowsInstaller
                     writer.WriteLine("");
                     writer.WriteLine("");
                     writer.WriteLine("{0}\t_ForceCodepage", value);
-                    writer.Close();
+                    writer.Dispose();
                     writer = null;
                     this.Import(tempFile);
                 }
                 finally
                 {
-                    if (writer != null) writer.Close();
+                    if (writer != null) writer.Dispose();
                     File.Delete(tempFile);
                 }
             }

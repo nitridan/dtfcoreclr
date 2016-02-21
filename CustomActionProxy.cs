@@ -18,7 +18,6 @@ namespace Microsoft.Deployment.WindowsInstaller
     using System.Security;
     using System.Reflection;
     using System.Collections;
-    using System.Configuration;
     using System.Runtime.InteropServices;
     using System.Diagnostics.CodeAnalysis;
 
@@ -114,8 +113,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             try
             {
                 // Set the current directory to the location of the extracted files.
-                Environment.CurrentDirectory =
-                    AppDomain.CurrentDomain.BaseDirectory;
+                Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
                 object[] args = new object[] { session };
                 if (DebugBreakEnabled(new string[] { entryPoint, methodName }))
@@ -204,35 +202,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             className = null;
             methodName = null;
 
-            string fullEntryPoint;
-            if (entryPoint.IndexOf('!') > 0)
-            {
-                fullEntryPoint = entryPoint;
-            }
-            else
-            {
-                IDictionary config;
-                try
-                {
-                    config = (IDictionary) ConfigurationManager.GetSection("customActions");
-                }
-                catch (ConfigurationException cex)
-                {
-                    session.Log("Error: missing or invalid customActions config section.");
-                    session.Log(cex.ToString());
-                    return false;
-                }
-                fullEntryPoint = (string) config[entryPoint];
-                if (fullEntryPoint == null)
-                {
-                    session.Log(
-                        "Error: custom action entry point '{0}' not found " +
-                        "in customActions config section.",
-                        entryPoint);
-                    return false;
-                }
-            }
-
+            var fullEntryPoint = entryPoint;
             int assemblySplit = fullEntryPoint.IndexOf('!');
             int methodSplit = fullEntryPoint.LastIndexOf('.');
             if (assemblySplit < 0 || methodSplit < 0 || methodSplit < assemblySplit)
@@ -269,7 +239,9 @@ namespace Microsoft.Deployment.WindowsInstaller
             Exception caughtEx = null;
             try
             {
-                customActionAssembly = AppDomain.CurrentDomain.Load(assemblyName);
+                //customActionAssembly = AppDomain.CurrentDomain.Load(assemblyName);
+                var context = new CustomLoadContext();
+                customActionAssembly = context.LoadFromFile(assemblyName);
                 customActionClass = customActionAssembly.GetType(className, true, true);
             }
             catch (IOException ex) { caughtEx = ex; }
@@ -312,8 +284,8 @@ namespace Microsoft.Deployment.WindowsInstaller
                 method.GetParameters().Length == 1 &&
                 method.GetParameters()[0].ParameterType == typeof(Session))
             {
-                object[] methodAttribs = method.GetCustomAttributes(false);
-                foreach (object attrib in methodAttribs)
+                var methodAttribs = method.GetCustomAttributes(false);
+                foreach (var attrib in methodAttribs)
                 {
                     if (attrib is CustomActionAttribute)
                     {

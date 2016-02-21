@@ -174,7 +174,7 @@ namespace Microsoft.Deployment.WindowsInstaller
             using (View view = this.OpenView(sql))
             {
                 view.Execute(record);
-                IList results = new ArrayList();
+                IList results = new List<object>();
                 int fieldCount = 0;
 
                 foreach (Record rec in view) using (rec)

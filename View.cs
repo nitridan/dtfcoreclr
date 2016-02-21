@@ -74,7 +74,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                     // for tokens that can come before or after the list of tables.
 
                     string parseSql = this.sql.Replace('\t', ' ').Replace('\r', ' ').Replace('\n', ' ');
-                    string upperSql = parseSql.ToUpper(CultureInfo.InvariantCulture);
+                    string upperSql = parseSql.ToUpper();
 
                     string[] prefixes = new string[] { " FROM ", " INTO ", " TABLE " };
                     string[] suffixes = new string[] { " WHERE ", " ORDER ", " SET ", " (", " ADD " };

@@ -16,6 +16,7 @@ namespace Microsoft.Deployment.WindowsInstaller
     using System.IO;
     using System.Text;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Diagnostics.CodeAnalysis;
 
@@ -228,7 +229,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                     {
                         this.SetInteger(field, (int) value);
                     }
-                    else if (valueType.IsSubclassOf(typeof(Stream)))
+                    else if (valueType.GetTypeInfo().IsSubclassOf(typeof(Stream)))
                     {
                         this.SetStream(field, (Stream) value);
                     }
@@ -643,11 +644,9 @@ namespace Microsoft.Deployment.WindowsInstaller
             {
                 if (!this.IsNull(field))
                 {
-                    Stream readStream = null, writeStream = null;
-                    try
+                    using (var readStream = new RecordStream(this, field))
+                    using (var writeStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                     {
-                        readStream = new RecordStream(this, field);
-                        writeStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
                         int count = 512;
                         byte[] buf = new byte[count];
                         while (count == buf.Length)
@@ -657,11 +656,6 @@ namespace Microsoft.Deployment.WindowsInstaller
                                 writeStream.Write(buf, 0, count);
                             }
                         }
-                    }
-                    finally
-                    {
-                        if (readStream != null) readStream.Close();
-                        if (writeStream != null) writeStream.Close();
                     }
                 }
             }
@@ -821,7 +815,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                     {
                         writeStream.Write(buf, 0, count);
                     }
-                    writeStream.Close();
+                    writeStream.Dispose();
                     writeStream = null;
 
                     uint ret = RemotableNativeMethods.MsiRecordSetStream((int) this.Handle, (uint) field, tempPath);
@@ -832,7 +826,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                 }
                 finally
                 {
-                    if (writeStream != null) writeStream.Close();
+                    if (writeStream != null) writeStream.Dispose();
                     if (File.Exists(tempPath))
                     {
                         try

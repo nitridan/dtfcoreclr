@@ -13,7 +13,6 @@
 namespace Microsoft.Deployment.WindowsInstaller
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -24,7 +23,7 @@ namespace Microsoft.Deployment.WindowsInstaller
     /// hold unmanaged resources (MSI handles) that should be properly disposed
     /// when no longer needed.
     /// </p></remarks>
-    public abstract class InstallerHandle : MarshalByRefObject, IDisposable
+    public abstract class InstallerHandle : IDisposable
     {
         private NativeMethods.MsiHandle handle;
 

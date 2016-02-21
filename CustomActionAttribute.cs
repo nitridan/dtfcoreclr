@@ -23,7 +23,7 @@ namespace Microsoft.Deployment.WindowsInstaller
     /// take a single <see cref="Session"/> object as a parameter,
     /// and return an <see cref="ActionResult"/> enumeration value.
     /// </p></remarks>
-    [Serializable, AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class CustomActionAttribute : Attribute
     {
         /// <summary>

@@ -50,7 +50,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                 throw new ArgumentNullException("columnDefinition");
             }
 
-            switch (Char.ToLower(columnDefinition[0], CultureInfo.InvariantCulture))
+            switch (Char.ToLower(columnDefinition[0]))
             {
                 case 'i': this.type = typeof(Int32);
                     break;
@@ -288,9 +288,8 @@ namespace Microsoft.Deployment.WindowsInstaller
                     t = (this.isTemporary ? 'O' : 'v');
                 }
                 return String.Format(
-                    CultureInfo.InvariantCulture,
                     "{0}{1}",
-                    (this.isRequired ? t : Char.ToUpper(t, CultureInfo.InvariantCulture)),
+                    (this.isRequired ? t : Char.ToUpper(t)),
                     this.size);
             }
         }

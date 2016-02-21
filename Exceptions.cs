@@ -17,15 +17,12 @@ namespace Microsoft.Deployment.WindowsInstaller
     using System.Text;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Security.Permissions;
-    using System.Runtime.Serialization;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Base class for Windows Installer exceptions.
     /// </summary>
-    [Serializable]
-    public class InstallerException : SystemException
+    public class InstallerException : Exception
     {
         private int errorCode;
         private object[] errorData;
@@ -73,21 +70,6 @@ namespace Microsoft.Deployment.WindowsInstaller
         }
 
         /// <summary>
-        /// Initializes a new instance of the InstallerException class with serialized data.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected InstallerException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            this.errorCode = info.GetInt32("msiErrorCode");
-        }
-
-        /// <summary>
         /// Gets the system error code that resulted in this exception, or 0 if not applicable.
         /// </summary>
         public int ErrorCode
@@ -117,23 +99,6 @@ namespace Microsoft.Deployment.WindowsInstaller
                 }
                 return msg;
             }
-        }
-
-        /// <summary>
-        /// Sets the SerializationInfo with information about the exception.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter=true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            info.AddValue("msiErrorCode", this.errorCode);
-            base.GetObjectData(info, context);
         }
 
         /// <summary>
@@ -301,7 +266,6 @@ namespace Microsoft.Deployment.WindowsInstaller
     /// <summary>
     /// User Canceled the installation.
     /// </summary>
-    [Serializable]
     public class InstallCanceledException : InstallerException
     {
         /// <summary>
@@ -333,22 +297,11 @@ namespace Microsoft.Deployment.WindowsInstaller
             : this(null, null)
         {
         }
-
-        /// <summary>
-        /// Initializes a new instance of the InstallCanceledException class with serialized data.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected InstallCanceledException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 
     /// <summary>
     /// A bad SQL query string was passed to <see cref="Database.OpenView"/> or <see cref="Database.Execute(string,object[])"/>.
     /// </summary>
-    [Serializable]
     public class BadQuerySyntaxException : InstallerException
     {
         /// <summary>
@@ -380,22 +333,11 @@ namespace Microsoft.Deployment.WindowsInstaller
             : this(null, null)
         {
         }
-
-        /// <summary>
-        /// Initializes a new instance of the BadQuerySyntaxException class with serialized data.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected BadQuerySyntaxException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 
     /// <summary>
     /// A method was called on an invalid installer handle.  The handle may have been already closed.
     /// </summary>
-    [Serializable]
     public class InvalidHandleException : InstallerException
     {
         /// <summary>
@@ -427,23 +369,12 @@ namespace Microsoft.Deployment.WindowsInstaller
             : this(null, null)
         {
         }
-
-        /// <summary>
-        /// Initializes a new instance of the InvalidHandleException class with serialized data.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected InvalidHandleException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 
     /// <summary>
     /// A failure occurred when executing <see cref="Database.Merge(Database,string)"/>.  The exception may contain
     /// details about the merge conflict.
     /// </summary>
-    [Serializable]
     public class MergeException : InstallerException
     {
         private IList<string> conflictTables;
@@ -504,22 +435,6 @@ namespace Microsoft.Deployment.WindowsInstaller
         }
 
         /// <summary>
-        /// Initializes a new instance of the MergeException class with serialized data.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        protected MergeException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            this.conflictTables = (string[]) info.GetValue("mergeConflictTables", typeof(string[]));
-            this.conflictCounts = (int[]) info.GetValue("mergeConflictCounts", typeof(int[]));
-        }
-
-        /// <summary>
         /// Gets the number of merge conflicts in each table, corresponding to the tables returned by
         /// <see cref="ConflictTables"/>.
         /// </summary>
@@ -563,24 +478,6 @@ namespace Microsoft.Deployment.WindowsInstaller
                 }
                 return msg.ToString();
             }
-        }
-
-        /// <summary>
-        /// Sets the SerializationInfo with information about the exception.
-        /// </summary>
-        /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter=true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            info.AddValue("mergeConflictTables", this.conflictTables);
-            info.AddValue("mergeConflictCounts", this.conflictCounts);
-            base.GetObjectData(info, context);
         }
     }
 }
