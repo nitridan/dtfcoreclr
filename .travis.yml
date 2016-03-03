@@ -1,3 +1,4 @@
+language: csharp
 branches:
   only:
     - master
@@ -11,4 +12,7 @@ install:
   - sudo apt-get install dotnet -y
 script:
   - dotnet restore
-  - dotnet pack
+  - dotnet pack -c Release --version-suffix=
+after_success:
+  - curl -O https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+  - ls bin/Debug | grep -e "\d\.nupkg" | while read nupkg; do mono nuget.exe push bin/Debug/$nupkg -ApiKey $API_KEY -Source https://www.myget.org/F/dtfcoreclr/api/v3/index.json ; done
