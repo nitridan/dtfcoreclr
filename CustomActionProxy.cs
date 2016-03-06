@@ -256,7 +256,7 @@ namespace Microsoft.Deployment.WindowsInstaller
                 return null;
             }
 
-            MethodInfo[] methods = customActionClass.GetMethods(
+            MethodInfo[] methods = customActionClass.GetTypeInfo().GetMethods(
                 BindingFlags.Public | BindingFlags.Static);
             foreach (MethodInfo method in methods)
             {
