@@ -1,8 +1,10 @@
 ﻿{
     "version": "1.0.0-release-*",
     "name": "Microsoft.Deployment.WindowsInstaller",
-    "compilationOptions": {
-        "emitEntryPoint": false
+    "buildOptions": {
+        "embed": [
+            "**/*.resources"            
+        ]
     },
 
     "dependencies": {
@@ -17,11 +19,6 @@
     },
 
     "frameworks": {
-        "dnxcore50": { }
-    },
-
-    "compile": "**/*.cs",
-    "resource": [
-        "**/*.resources"
-    ]
+        "netcoreapp1.0": { }
+    }
 }
