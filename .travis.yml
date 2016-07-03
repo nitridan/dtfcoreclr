@@ -15,4 +15,4 @@ script:
   - dotnet pack -c Release --version-suffix=$TRAVIS_BUILD_NUMBER
 after_success:
   - curl -O https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-  - 'mono ./nuget.exe push ./bin/Release/Microsoft.Deployment.WindowsInstaller.1.1.0-release-$TRAVIS_BUILD_NUMBER.nupkg -ApiKey $API_KEY -Source https://www.myget.org/F/dtfcoreclr/api/v3/index.json'
+  - 'mono ./nuget.exe push ./bin/Release/Microsoft.Deployment.WindowsInstaller.1.2.0-release-$TRAVIS_BUILD_NUMBER.nupkg -ApiKey $API_KEY -Source https://www.myget.org/F/dtfcoreclr/api/v3/index.json'
